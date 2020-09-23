@@ -22,7 +22,14 @@ tumData <- select(T, starts_with("tumor"))
 
 ### Snapshots
 ```{r snapshots}
-[results, data] <- snapshots(normData)
+results <- snapshots(normData)
+```
 
+### Eigenfunctions
+```{r eigenfunctions}
+M <- results.eigenfunction
+M <- t(M)
 
+numofpoints <- size(M, 1)
+data <- linspace(0, 1, numofpoints)
 ```

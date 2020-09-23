@@ -9,5 +9,30 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 ### Create Snapshot
 ```{r snapshot}
-
+snapshots <- function(data) {
+  
+  # Construct eigenfunctions by using eigenvectors
+  cx <- data
+  mx <- size(cx,2)
+  
+  # Compute eigenvectors and eigenvalues of covariance matrix
+  k <- 21 # number of eigenvalues
+  M <- size(cx,2)
+  
+  #Run SVD to compute eigenvalues and eigenvectors
+  C <- (t(cx) * cx) / M #Covariance matrix
+  svd(C)
+  s <- diag(u)
+  s <- s(1:k)
+  u <- d(1:k)
+  
+  results.covariance <- C
+  results.eigenvalues <- s
+  results.eigenvectors <- u
+  
+  # Normalize eigenfunction
+  xefun <- t(results.eigenvectors) * t(cx) / (sqrt(s)/sqrt(M))
+  
+  results.eigenfunction <- xefun
+}
 ```
