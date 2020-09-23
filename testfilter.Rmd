@@ -3,8 +3,9 @@ title: "testfilter"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=True}
+library(tidyverse)
+T = read.table('data/Colon.txt')
 ```
 
 ## R Markdown
