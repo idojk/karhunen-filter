@@ -1,14 +1,3 @@
----
-title: "Method of Snapshots"
-output: pdf_document
----
-
-## Description
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-### Create Snapshot
-```{r snapshot}
 snapshots <- function(data) {
   
   # Construct eigenfunctions by using eigenvectors
@@ -17,7 +6,6 @@ snapshots <- function(data) {
   
   # Compute eigenvectors and eigenvalues of covariance matrix
   k <- 21 # number of eigenvalues
-  M <- size(cx,2)
   
   #Run SVD to compute eigenvalues and eigenvectors
   C <- (t(cx) * cx) / M #Covariance matrix
@@ -31,8 +19,7 @@ snapshots <- function(data) {
   results.eigenvectors <- u
   
   # Normalize eigenfunction
-  xefun <- t(results.eigenvectors) * t(cx) / (sqrt(s)/sqrt(M))
+  xefun <- t(results.eigenvectors) * t(cx) / (sqrt(s)/sqrt(mx))
   
   results.eigenfunction <- xefun
 }
-```
