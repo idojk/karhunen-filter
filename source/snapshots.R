@@ -1,7 +1,7 @@
 snapshots <- function(data) {
   
   # Construct eigenfunctions by using eigenvectors
-  cx <- array(data)
+  cx <- data
   mx <- dim(cx)[2]
   
   # Compute eigenvectors and eigenvalues of covariance matrix
