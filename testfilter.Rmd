@@ -7,10 +7,10 @@ output:
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-### Load packages
+### Load packages and functions
 ```{r load, message=FALSE}
 library(tidyverse)
-source('source/snapshots.R')
+source("source/snapshots.R")
 ```
 
 ### Load cancer data
@@ -27,8 +27,7 @@ results <- snapshots(normData)
 
 ### Eigenfunctions
 ```{r eigenfunctions}
-M <- results.eigenfunction
-M <- t(M)
+M <- t(results.eigenfunction)
 
 numofpoints <- size(M, 1)
 data <- linspace(0, 1, numofpoints)
