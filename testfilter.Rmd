@@ -11,6 +11,8 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 ```{r load, message=FALSE}
 library(tidyverse)
 source("source/snapshots.R")
+source("source/multilevelbasis.R")
+  source("source/tree/convertbintreetolist.R")
 ```
 
 ### Load cancer data
@@ -31,4 +33,28 @@ M <- t(results.eigenfunction)
 
 numofpoints <- size(M, 1)
 data <- linspace(0, 1, numofpoints)
+n <- dim(M, 2)
+x <- 0 : ( 1 / (numofpoints-1) ) : 1
+
+polymodel.M <- 
+params.indexsetsize <- n
 ```
+
+```{r multilevel binary tree}
+make_tree(data, @split_KD, params)
+
+
+```
+
+```{r multilevel basis}
+multilevelbasis(datatree, sortdata, degree, polymodel)
+
+
+```
+
+```{r plot}
+
+
+
+```
+
