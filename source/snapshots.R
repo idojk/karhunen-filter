@@ -2,7 +2,7 @@ snapshots <- function(data) {
   
   # Construct eigenfunctions by using eigenvectors
   cx <- data
-  mx <- size(cx,2)
+  mx <- dim(cx)[2]
   
   # Compute eigenvectors and eigenvalues of covariance matrix
   k <- 21 # number of eigenvalues
