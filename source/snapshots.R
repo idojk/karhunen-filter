@@ -17,7 +17,7 @@ data<-read.csv(file="Colon.txt", header=TRUE)
   V <- ss$v
   
   results.covariance <- C
-  results.eigenvalues <- s
+  results.eigenvalues <- ss
   results.eigenvectors <- u
   
   # Normalize eigenfunction
