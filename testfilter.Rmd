@@ -40,18 +40,21 @@ polymodel.M <-
 params.indexsetsize <- n
 ```
 
+### Make Tree
 ```{r multilevel binary tree}
 make_tree(data, @split_KD, params)
 
 
 ```
 
+### Construct Multilevel Basis
 ```{r multilevel basis}
 multilevelbasis(datatree, sortdata, degree, polymodel)
 
 
 ```
 
+### Plot results
 ```{r plot}
 
 

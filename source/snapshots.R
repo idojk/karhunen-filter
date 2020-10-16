@@ -20,7 +20,7 @@ snapshots <- function(data) {
   results.eigenvectors <- u
   
   # Normalize eigenfunction
-  xefun <- (t(results.eigenvectors) * t(cx) / (sqrt(s)/sqrt(mx)))
+  #xefun <- (t(results.eigenvectors) * t(cx) / (sqrt(s)/sqrt(mx)))
   
-  results.eigenfunction <- xefun
+  #results.eigenfunction <- xefun
 }
