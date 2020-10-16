@@ -11,10 +11,10 @@ data<-read.csv(file="Colon.txt", header=TRUE)
   M<-matrix(1,mx,mx)
   #Run SVD to compute eigenvalues and eigenvectors
   C <- (t(cx) * cx) / M #Covariance matrix
-  s<-svd(C)
-  D <- s$d
-  U <- s$u
-  V <- s$v
+  ss<-svd(C)
+  D <- ss$d
+  U <- ss$u
+  V <- ss$v
   
   results.covariance <- C
   results.eigenvalues <- s
