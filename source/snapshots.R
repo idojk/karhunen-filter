@@ -11,8 +11,8 @@ snapshots <- function(data) {
   C <- ((t(cx) * cx) / mx) #Covariance matrix
   svd(C)
  s <- diag(C$s)
- s <- s(1:k)
- u <- C$u(1:k)
+ s <- s[1:k]
+ u <- C$u[1:k]
 
   
   results.covariance <- C
