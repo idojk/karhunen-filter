@@ -3,12 +3,8 @@
 # 20201024 Xiaoyang Chen
 # two way to get patition cells: get_partition_cells or traverse
 
-#setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\")
-#data<-read.csv(file="Colon.txt", header=TRUE)
-#cx <-as.matrix(data)
 
-
-
+cx <-as.matrix(data)
 ###function partitions = traverse(TEST_DATA,tree,curr_depth,MAX_DEPTH)
 tree<-data.frame("threshold"=0, "split_dir"=0,"right"=0, "left"=0)
 # tree$threshold
@@ -17,9 +13,7 @@ if (curr_depth >=MAX_DEPTH){break}
 if (left %in% tree){break}
 if (tree$left=0){break}
 
-
 idx=as.integer((cx%*%tree$split_dir)<=tree$threshold)
-#Error in cx %*% tree$split_dir : non-conformable arguments
 
 if sum(idx)>0 {
   lparts<-traverse(cx[idx,:],tree$left,curr_depth+1,MAX_DEPTH);
