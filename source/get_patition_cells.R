@@ -3,6 +3,9 @@
 # 20201024 Xiaoyang Chen
 # two way to get patition cells: get_partition_cells or traverse
 
+###function partitions = get_partition_cells(TEST_DATA, tree, MAX_DEPTH)
+if (nargin<3) {MAX_DEPTH = inf}
+# then go to function: partitions = traverse(TEST_DATA,tree,1,MAX_DEPTH);
 
 cx <-as.matrix(data)
 ###function partitions = traverse(TEST_DATA,tree,curr_depth,MAX_DEPTH)
