@@ -41,8 +41,6 @@ source("multilevelbasis.R")
 multilevelbasis
 
 ###  Run transform with random data-Orginal realization of the stochastic process
-cte<-sqrt(3) * 2 * (runif(n) - 1/2
-Q = 1 + M *(cte*eigenlambda)
-
-plot(x,Q)
-title(main='KL Realization')
+cte<-as.matrix(sqrt(3) * 2 * (runif(n) - 1/2))
+Q = 1 + M %*%(cte*eigenlambda)
+plot(x,Q,title(main='KL Realization'))
