@@ -70,3 +70,44 @@ print('Total error = %e \n', totalerror)
 }
 
 ### Plot coefficients
+figure(2)
+maxlevel = max(levelcoeff)
+numlevel = 3
+counter = 1
+subplot(numlevel + 2,1,counter)
+plot(x,Q)
+for (n in maxlevel : -1 : maxlevel - numlevel){
+counter = counter + 1
+subplot(numlevel + 2, 1, counter, title('Level Coefficients = ',num2str(n))) #TBD
+stem(coeff(levelcoeff == n))
+}
+
+### Run trans
+print('\n');
+print('Add Bump to KL  --------------------------------\n')
+
+#Random realization
+#Q = polymodel.M * rand(size(polymodel.M,2),1);
+
+#Add Gaussian "bump" to the data
+sbump = 0.5
+Qkl = Q
+sigma = 0.001
+maxbump = 0.05
+bump <- maxbump * exp(- ((t(x) - sbump)^2) /sigma)
+bump[1:150] = 0
+bump[350:end] = 0
+Q = Q + bump
+
+numvecs = ncol(Q)
+maxerror =Inf
+maxwaverror =Inf
+#tic;
+for (n in 1 : numvecs){
+    data.frame(coeff, levelcoeff, dcoeffs, ccoeffs) = hbtrans(Q[,n], multileveltree, ind, datacell, datalevel)
+    Qv = invhbtrans(dcoeffs, ccoeffs, multileveltree, ind, datacell, datalevel, numofpoints)
+    polyerror[n] = norm(Q[,n] - Qv, 2) / norm(Q[,n])
+    wavecoeffnorm[n] = norm(coeff[1 : end - params.indexsetsize],'inf')/norm(Q[,n])
+}
+#t = toc;
+
