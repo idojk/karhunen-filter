@@ -58,3 +58,15 @@ polyerror(n)  <- norm(Q[,n] - Qv, 2) / norm(Q[,n])
 wavecoeffnorm(n)  <- norm(coeff[1 : end - params.indexsetsize],'inf')/norm(Q[,n])
 }
 #t  <- toc
+
+#Test format change from vector of coefficients to struct
+totalerror=0
+as.matrix(a,b) <- hbvectortocoeffs(coeff, multileveltree, ind, datacell, datalevel, numofpoints)
+for (i in 1 : length(dcoeffs)){
+totalerror <- totalerror + (norm[a[i] -  dcoeffs[i]])
+end
+totalerror <- totalerror + (norm[b -  ccoeffs])
+print('Total error = %e \n', totalerror)
+}
+
+### Plot coefficients
