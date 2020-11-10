@@ -44,3 +44,17 @@ multilevelbasis
 cte<-as.matrix(sqrt(3) * 2 * (runif(n) - 1/2))
 Q = 1 + M %*%(cte*eigenlambda)
 plot(x,Q,title(main='KL Realization'))
+
+### Metrics
+numvecs  <- ncol(Q)
+maxerror=Inf
+maxwaverror=Inf
+
+#tic; set timer to R
+for (n in 1:numvecs){
+data.frame(coeff, levelcoeff, dcoeffs, ccoeffs) <- hbtrans(Q[,n], multileveltree, ind, datacell, datalevel)
+Qv  <- invhbtrans(dcoeffs, ccoeffs, multileveltree, ind, datacell, datalevel, numofpoints)
+polyerror(n)  <- norm(Q[,n] - Qv, 2) / norm(Q[,n])
+wavecoeffnorm(n)  <- norm(coeff[1 : end - params.indexsetsize],'inf')/norm(Q[,n])
+}
+#t  <- toc
