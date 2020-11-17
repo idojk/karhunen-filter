@@ -3,33 +3,31 @@
 # 20201115 Xiaoyang Chen
 
 
-setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\")
-data<-read.csv(file="Colon.txt", header=TRUE)
-
-cx <-as.matrix(data)
-dim(cx)
-mx <- dim(cx)[2] # mx is a dimention: 2000 gene site, 62 obs from tumor and normal tissue sample
-
 #function [left_idxs, right_idxs, threshold, split_dir, proj_data] = split_KD(DATA, params)
+split_KD<- function(DATA, params){
+
+`%notin%` <- Negate(`%in%`)
 if ('spill' %notin% params){params$spill=0}
 dir<-matrix(0L,nrow=mx,ncol=1) # dir is a 0 matrix if n*1
 vrs<-apply(cx,2,var)
 v<-max(vrs)
 
-projdata<-cx%*%dir
+projDATA<-cx%*%dir
+thresh<-median(projDATA)
+  
+prc<-quantile(projDATA,c((0.5-params$spill)*100, (0.5+params$spill)*100))
+comm_idx  = projDATA>prc[1] & projDATA<prc[2] #returnT or F
+idx_left  = projDATA <= thresh #returnT or F
+idx_right = projDATA > thresh
 
-thresh<-median(projDATA,1);
+split_dir<- dir
+threshold<- thresh
+left_idxs = idx_left | comm_idx #return T or F
+right_idxs = idx_right | comm_idx
+proj_data <- projDATA
 
-prc = prctile(projDATA,[0.5-params.spill, 0.5+params.spill]*100);
-
-comm_idx  = projDATA>prc(1) & projDATA<prc(2);
-idx_left  = projDATA <= thresh;
-idx_right = projDATA > thresh;
-
-split_dir = dir;
-threshold = thresh;
-left_idxs = idx_left | comm_idx;
-right_idxs = idx_right | comm_idx;
-proj_data = projDATA;
+split_KD<-list(left_idxs, right_idxs, threshold, split_dir, proj_data)
+return(split_KD)
+}
 
 
