@@ -12,13 +12,12 @@
 
 
 #start
+`%notin%` <- Negate(`%in%`)
 
 ### function [tree,DATA] = make_tree(DATA,split_function,params)
 make_tree<-function(DATA,split_function,params){
   ### define make tree function
-  #setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\")
   if (nargin<2){
-    #source("split_PCA.R")
     split_function=split_PCA
     }
   #if (nargin<3){params<-matrix(NaN,1,mx)} # a row vector
@@ -40,7 +39,12 @@ make_tree<-function(DATA,split_function,params){
 
 ### define create_tree function
 ### [tree, node,DATA] = create_tree(DATA,1:size(DATA,1),split_function,params.indexsetsize,params.split_fxn_params, params.MAX_DEPTH,1,node);
-create_tree<-function(DATA,DATA[1,1:size],split_function,params.indexsetsize,params.split_fxn_params, params.MAX_DEPTH,1,node)){
+create_tree<-function(DATA,1:size(DATA,1),split_function,params.indexsetsize,params.split_fxn_params, params.MAX_DEPTH,1,node)){
+  setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\")
+  # path in package
+  source("split_KD.R")
+  #source("split_function.R")
+  
   # initialize
   idxs=10;
   tree$idxs = idxs
@@ -53,7 +57,7 @@ create_tree<-function(DATA,DATA[1,1:size],split_function,params.indexsetsize,par
   tree$idxsmax = max(DATA[idxs,])
   tree$idxsmin = min(DATA[idxs,])
   
-  # Add depth to each node
+  # Add depth to each node: curr_depth not initialize in matlab code
   tree$currentdepth = curr_depth - 1;
   
   # Add node numbering
@@ -76,7 +80,7 @@ create_tree<-function(DATA,DATA[1,1:size],split_function,params.indexsetsize,par
   }
   
   #[idx_left, idx_right, threshold, split_dir, proj_data] = split_function(DATA(idxs,:), split_fxn_params);
-  b<- split_function(DATA(idxs,:), split_fxn_params);
+  b<- split_function(DATA(idxs,:), split_fxn_params)
   left_idxs = idxs[idx_left]
   right_idxs = idxs[idx_right]
   
@@ -93,7 +97,7 @@ create_tree<-function(DATA,DATA[1,1:size],split_function,params.indexsetsize,par
   # Test
   if ((length(left_idxs) < indexsetsize) || (length(right_idxs) < indexsetsize)){break}
   
-  # Split
+  # Split (loops here)
   tree$childleft<-node
   [tree$left, node]<-create_tree(DATA,left_idxs ,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
   tree$childright<- node
