@@ -64,8 +64,8 @@ create_tree<-function(DATA,idxs,split_function,params.indexsetsize,params.split_
   
   # initialize
   tree<-data.frame(matrix(ncol = 1, nrow = 1)) #initialize null dataframe
-  idxs=10
   tree$idxs = idxs
+  mx <- dim(cx)[2]
   tree$left = matrix(NaN,1,mx)
   tree$right = matrix(NaN,1,mx)
   tree$threshold = NaN
@@ -84,23 +84,23 @@ create_tree<-function(DATA,idxs,split_function,params.indexsetsize,params.split_
   
   # increase node
   node = node + 1
-  cellinfo <-data.frame(matrix(ncol = 1, nrow = 1))
+  #cellinfo <-data.frame(matrix(ncol = 1, nrow = 1))
   
   if (curr_depth >= MAX_DEPTH){
   # cellinfo[1] = tree
   # treelist = as.data.frame.matrix(table(treelist, cellinfo))
   break
   }
-  if (length(idxs)<= (ceil(indexsetsize + 1 ))){
+  if (length(idxs)<= (ceiling(indexsetsize + 1 ))){
   # cellinfo[1] = tree
   # treelist = as.data.frame.matrix(table(treelist, cellinfo))
   break  
   }
   
   #[idx_left, idx_right, threshold, split_dir, proj_data] = split_function(DATA(idxs,:), split_fxn_params);
-  b<- split_function(DATA[idxs,], split_fxn_params)
-  left_idxs = idxs[idx_left]
-  right_idxs = idxs[idx_right]
+  sp<- split_function(DATA[idxs,], split_fxn_params)
+  left_idxs <- idxs[idx_left]
+  right_idxs <- idxs[idx_right]
   
   
   # Reorder nodes and data
@@ -121,9 +121,9 @@ create_tree<-function(DATA,idxs,split_function,params.indexsetsize,params.split_
   tree$childright<- node
   [tree$right, node]<- create_tree(DATA,right_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
   
-  tree$threshold<-threshold
-  tree$split_dir<-split_dir
-  tree$proj_data<-proj_data
+  tree$threshold<-sp$threshold
+  tree$split_dir<-sp$split_dir
+  tree$proj_data<-sp$proj_data
   
   # Add information on parent node
   tree$left$parentnode<- parentnode
