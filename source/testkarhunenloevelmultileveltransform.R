@@ -2,6 +2,7 @@
 # testkarhunenloevelmultileveltransform.m
 # 20201107 Xiaoyang Chen
 
+`%notin%` <- Negate(`%in%`)
 ###Data and parameters
 degree <-matrix(NaN,1,1)
 numofpoints <-500
@@ -33,8 +34,9 @@ indexsetsize = n
 params<-data.frame(indexsetsize)
 
 ### Create Multilevel Binary tree
+setwd("H:/2021Sep/Julio/ChangeDetection/ChangeDetectionR")
 source("make_tree.R")
-make_tree
+a<-make_tree(data,split_KD,params)
 
 ###  Create multilevel basis
 source("multilevelbasis.R")
