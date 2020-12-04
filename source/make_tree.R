@@ -120,6 +120,6 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   
   # return value
   #create_tree_result<-list(tree,node,DATA)
-  return(list(tree,node))
+  return(list("tree"=tree,"node"=node))
 }
 
