@@ -59,8 +59,8 @@ make_tree<-function(DATA,split_function,params){
 create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MAX_DEPTH,curr_depth,node){
   setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\")
   # path in package
-  source("split_KD.R")
-  #source("split_function.R")
+  # source("split_KD.R")
+  source(paste0(split_function,".R"))
   
   # initialize
   tree<-data.frame(matrix(ncol = 1, nrow = 1)) #initialize null dataframe
