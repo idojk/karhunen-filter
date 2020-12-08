@@ -2,13 +2,6 @@
 # make_tree.m
 # 20201029 Xiaoyang Chen
 
-#simulation settings
-# setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\")
-# data<-read.csv(file="Colon.txt", header=TRUE)
-# cx <-as.matrix(data)
-# mx <- dim(cx)[2]
-# DATA<-cx
-
 
 #start
 `%notin%` <- Negate(`%in%`)
@@ -48,8 +41,6 @@ make_tree<-function(DATA,split_function,params){
   #ct=[tree, node,DATA]
   #idxs=1:nrow(DATA)
   #curr_depth=1
-  # str(idxs) is a Integer Vector
-  # idxs[1]
   ct<-create_tree(DATA,1:nrow(DATA),split_function,params$indexsetsize,params$split_fxn_params, params$MAX_DEPTH,1,node)
   ct$tree$size <- node
 }
