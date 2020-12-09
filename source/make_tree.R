@@ -2,6 +2,16 @@
 # make_tree.m
 # 20201029 Xiaoyang Chen
 
+#simulation settings
+# setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\")
+# real data
+# data<-read.csv(file="Colon.txt", header=TRUE)
+
+# simulate data
+# cx <-as.matrix(data)
+# mx <- dim(cx)[2]
+# DATA<-t(cx)
+
 
 #start
 `%notin%` <- Negate(`%in%`)
@@ -15,6 +25,7 @@
 make_tree<-function(DATA,split_function,params){
   # define nargin in R
   #print(match.call())
+  # nargin=3
   nargin <- length(as.list(match.call())) -1
 
   ### define make tree function
@@ -39,8 +50,10 @@ make_tree<-function(DATA,split_function,params){
   # Create tree
   #[tree, node,DATA] = create_tree(DATA,1:size(DATA,1),split_function,params.indexsetsize,params.split_fxn_params, params.MAX_DEPTH,1,node);
   #ct=[tree, node,DATA]
-  #idxs=1:nrow(DATA)
   #curr_depth=1
+  # idxs=1:nrow(DATA)
+  # str(idxs) is a Integer Vector
+  # idxs[1]
   ct<-create_tree(DATA,1:nrow(DATA),split_function,params$indexsetsize,params$split_fxn_params, params$MAX_DEPTH,1,node)
   ct$tree$size <- node
 }
@@ -48,15 +61,16 @@ make_tree<-function(DATA,split_function,params){
 ### define create_tree function
 ### [tree, node,DATA] = create_tree(DATA,1:size(DATA,1),split_function,params.indexsetsize,params.split_fxn_params, params.MAX_DEPTH,1,node);
 create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MAX_DEPTH,curr_depth,node){
+  # curr_depth=1
+  # MAX_DEPTH<-params$MAX_DEPTH
   setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\")
   # path in package
-  # source("split_KD.R")
-  source(paste0(split_function,".R"))
+
   
   # initialize
-  tree<-data.frame(matrix(ncol = 1, nrow = 1)) #initialize null dataframe
-  tree$idxs = idxs
-  mx <- dim(DATA)[2]
+  tree<-data.frame(matrix(ncol = 1, nrow = 1))  #initialize null dataframe
+  tree$idxs = idxs #idx is 1:500 row list
+  mx <- dim(DATA)[1]
   tree$left = matrix(NaN,1,mx)
   tree$right = matrix(NaN,1,mx)
   tree$threshold = NaN
@@ -84,8 +98,25 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   return(list(tree,node))
   }
   
+  
   #[idx_left, idx_right, threshold, split_dir, proj_data] = split_function(DATA(idxs,:), split_fxn_params);
+  # source('split_KD.R')
+
+  
+  # source(paste('"',split_function,'.R"'))
+  # paste0('"',split_function,'.R"')
+  # gsub(" ",paste("'",split_function,".R'"))
+  # source(paste0("'",split_function,".R'"))
+  # split_function=split_KD 
+  # split_function2='split_KD'
+  # str(split_function)
+  # str(split_function2)
+  # print(str(split_function))
+  source(paste0("'",split_function,"'.R")) # instead of split_function='split_KD'
+  #   cannot coerce type 'closure' to vector of type 'character'
   # sp<- split_function(DATA[idxs,], split_fxn_params)
+  # sp<- split_KD(DATA[idxs,], split_fxn_params)
+  # str(sp)
   split_function(DATA[idxs,], split_fxn_params)
   left_idxs <- idxs[idx_left]
   right_idxs <- idxs[idx_right]
@@ -113,4 +144,5 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   #create_tree_result<-list(tree,node,DATA)
   return(list("tree"=tree,"node"=node))
 }
+
 
