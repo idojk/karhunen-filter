@@ -118,8 +118,10 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   # sp<- split_KD(DATA[idxs,], split_fxn_params)
   # str(sp)
   split_function(DATA[idxs,], split_fxn_params)
-  left_idxs <- idxs[idx_left]
-  right_idxs <- idxs[idx_right]
+  left_idxs <- idxs*idx_left
+  left_idxs<-left_idxs[left_idxs!=0]
+  right_idxs <- idxs*idx_right
+  right_idxs<-right_idxs[right_idxs!=0]
   
   # Test
   if ((length(left_idxs) < indexsetsize) || (length(right_idxs) < indexsetsize)){
