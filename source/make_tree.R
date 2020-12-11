@@ -117,10 +117,10 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   # sp<- split_function(DATA[idxs,], split_fxn_params)
   # sp<- split_KD(DATA[idxs,], split_fxn_params)
   # str(sp)
-  split_function(DATA[idxs,], split_fxn_params)
-  left_idxs <- idxs*idx_left
+  a<-split_KD(DATA, split_fxn_params)
+  left_idxs <- idxs*a$idx_left
   left_idxs<-left_idxs[left_idxs!=0]
-  right_idxs <- idxs*idx_right
+  right_idxs <- idxs*a$idx_right
   right_idxs<-right_idxs[right_idxs!=0]
   
   # Test
