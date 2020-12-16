@@ -114,13 +114,15 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   # print(str(split_function))
   source(paste0("'",split_function,"'.R")) # instead of split_function='split_KD'
   #   cannot coerce type 'closure' to vector of type 'character'
-  # sp<- split_function(DATA[idxs,], split_fxn_params)
-  # sp<- split_KD(DATA[idxs,], split_fxn_params)
+
+  sp<-split_KD(DATA, split_fxn_params)
+  # split_function(DATA[idxs,], split_fxn_params)
+  # split_KD(DATA[idxs,], split_fxn_params)
   # str(sp)
-  a<-split_KD(DATA, split_fxn_params)
-  left_idxs <- idxs*a$idx_left
+  
+  left_idxs <- idxs*sp$left_idx
   left_idxs<-left_idxs[left_idxs!=0]
-  right_idxs <- idxs*a$idx_right
+  right_idxs <- idxs*sp$right_idxs
   right_idxs<-right_idxs[right_idxs!=0]
   
   # Test
