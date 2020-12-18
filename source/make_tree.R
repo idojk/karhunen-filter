@@ -144,9 +144,13 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   
   # Split (loops here) 
   tree$childleft<-node
-  tree$left<-create_tree(DATA,left_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
+  left<-create_tree(DATA,left_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
+  str(left)
+  tree$left<-left
+  
   tree$childright<- node
-  tree$right<-create_tree(DATA,right_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
+  right<-create_tree(DATA,right_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
+  tree$right<-right
   
   tree$threshold<-sp$threshold
   tree$split_dir<-sp$split_dir
