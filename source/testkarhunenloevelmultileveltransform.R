@@ -36,7 +36,10 @@ params<-data.frame(indexsetsize)
 ### Create Multilevel Binary tree
 setwd("H:/2021Sep/Julio/ChangeDetection/ChangeDetectionR")
 source("make_tree.R")
-a<-make_tree(data,split_KD,params)
+start_time<- Sys.time()
+mt<-make_tree(data,split_KD,params)
+end_time<- Sys.time()
+end_time-start_time
 
 ###  Create multilevel basis
 source("multilevelbasis.R")
