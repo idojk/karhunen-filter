@@ -109,7 +109,7 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   
   #[idx_left, idx_right, threshold, split_dir, proj_data] = split_function(DATA(idxs,:), split_fxn_params);
   source('split_KD.R')
-  sp<-split_KD(DATA, split_fxn_params)
+  sp<-split_KD(DATA[idxs,], split_fxn_params)
 
   
   #overwrite left_idxs and right_idxs for next layer
