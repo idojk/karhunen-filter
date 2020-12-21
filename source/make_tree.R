@@ -1,19 +1,7 @@
 # Julio Change Detection
 # make_tree.m
 # 20201029 Xiaoyang Chen
-
-#12/16 use matrix if list is slow, choose one [dataframe require same size]
-#12/16 timing compare to matlab [done]
-#validation: save R to .mat then run in matlab to see if they are the same [idxs not append]
-
-# setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\")
-# real data
-# data<-read.csv(file="Colon.txt", header=TRUE)
-
-# simulate data
-# cx <-as.matrix(data)
-# mx <- dim(cx)[2]
-# DATA<-t(cx)
+# complete date 12/20/2020
 
 #start
 `%notin%` <- Negate(`%in%`)
@@ -29,7 +17,6 @@ make_tree<-function(DATA,split_function,params){
   if (nargin<2){
     split_function='split_PCA'
   }
-
   if (nargin<3){params<-list()}
   if ('MAX_DEPTH' %notin% params){params$MAX_DEPTH=15}
   if ('split_fxn_params' %notin% params){   
@@ -41,6 +28,7 @@ make_tree<-function(DATA,split_function,params){
   #Initialize first node
   node=0
   
+  
   # Create tree
   #[tree, node,DATA] = create_tree(DATA,1:size(DATA,1),split_function,params.indexsetsize,params.split_fxn_params, params.MAX_DEPTH,1,node);
   create_tree_out<-create_tree(DATA,1:nrow(DATA),split_function,params$indexsetsize,params$split_fxn_params, params$MAX_DEPTH,1,node)
@@ -51,24 +39,10 @@ make_tree<-function(DATA,split_function,params){
 
 ### define create_tree function
 
-# DATA<-as.matrix(seq(0,d,len=numofpoints))
-# curr_depth=1
-# idxs=1:nrow(data)
-# idxs[1]
-# MAX_DEPTH<-params$MAX_DEPTH
-# params$MAX_DEPTH=15
-# spill <-0
-# split_fxn_params<-as.data.frame(spill)
-# params$split_fxn_params<-split_fxn_params
-# node=0
-
-#sencond run
-# tree$idxs <-list(left_idxs)
-# curr_depth=2
-
 ### [tree, node,DATA] = create_tree(DATA,1:size(DATA,1),split_function,params.indexsetsize,params.split_fxn_params, params.MAX_DEPTH,1,node);
 create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MAX_DEPTH,curr_depth,node){
   setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\") #change to package path
+  
   
   # initialize
   tree<-list()  #initialize null dataframe
@@ -89,27 +63,23 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   tree$node = node
   parentnode = node
   
+  
   # increase node
   node = node + 1
   print(node)
   #cellinfo <-data.frame(matrix(ncol = 1, nrow = 1))
   
   if (isTRUE(curr_depth>=MAX_DEPTH)) {
-    # return(data.frame(tree,node,data))
-    # return(list("tree"=tree,"node"=node,"DATA"=data))
-    return(list("tree"=tree,"node"=node,"DATA"=sp$proj_data))
+     return(list("tree"=tree,"node"=node,"DATA"=data))
   }
   if (isTRUE( length(idxs)<=ceiling(indexsetsize + 1) )) {
-    # return(data.frame(tree,node,data))
-    # return(list("tree"=tree,"node"=node,"DATA"=data))
-    return(list("tree"=tree,"node"=node,"DATA"=sp$proj_data))
+     return(list("tree"=tree,"node"=node,"DATA"=data))
   }
-  
   
   
   #[idx_left, idx_right, threshold, split_dir, proj_data] = split_function(DATA(idxs,:), split_fxn_params);
   source('split_KD.R')
-  sp<-split_KD(DATA[idxs,], split_fxn_params)
+  sp<-split_KD(as.matrix(DATA[idxs,]), split_fxn_params)
 
   
   #overwrite left_idxs and right_idxs for next layer
@@ -118,26 +88,26 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   right_idxs <- idxs*sp$right_idxs
   right_idxs<-right_idxs[right_idxs!=0]
   
+  
   # Test
   if (  (length(left_idxs)< indexsetsize) || (length(right_idxs) < indexsetsize)  ){
-    # return(data.frame(tree,node,data))
-    # return(list("tree"=tree,"node"=node,"DATA"=data))
-    return(list("tree"=tree,"node"=node,"DATA"=sp$proj_data))
+     return(list("tree"=tree,"node"=node,"DATA"=data))
   }
   
   
   # Split (loops here) 
   tree$childleft<-node
   leftout<-create_tree(DATA,left_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
-  tree$left$tree<-leftout$tree
+  tree$left<-leftout$tree
   tree$node<-leftout$node
   tree$DATA<-leftout$DATA
-
+  
   tree$childright<- node
   rightout<-create_tree(DATA,right_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
-  tree$right$tree<-rightout$tree
+  tree$right<-rightout$tree
   tree$node<-rightout$node
   tree$DATA<-rightout$DATA
+  
   
   tree$threshold<-sp$threshold
   tree$split_dir<-sp$split_dir
@@ -148,7 +118,7 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   tree$right$parentnode<- parentnode
   
   # return(data.frame(tree,node,data))
-  #return(list("tree"=tree,"node"=node,"DATA"=data))
-  return(list("tree"=tree,"node"=node,"DATA"=sp$proj_data))
+  return(list("tree"=tree,"node"=node,"DATA"=data))
 }
+
 
