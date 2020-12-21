@@ -3,12 +3,13 @@
 # 20201107 Xiaoyang Chen
 
 `%notin%` <- Negate(`%in%`)
+
 ###Data and parameters
 degree <-matrix(NaN,1,1)
 numofpoints <-500
 
 d <-1
-data <-as.matrix(t(seq(0,d,len=numofpoints)))
+data <-as.matrix(seq(0,d,len=numofpoints))
 n <-10
 x <-as.matrix(seq(0,d,len=numofpoints))
 M <-matrix(1,dim(x)[1],dim(x)[2])
@@ -36,10 +37,14 @@ params<-data.frame(indexsetsize)
 ### Create Multilevel Binary tree
 setwd("H:/2021Sep/Julio/ChangeDetection/ChangeDetectionR")
 source("make_tree.R")
+
 start_time<- Sys.time()
 mt<-make_tree(data,split_KD,params)
 end_time<- Sys.time()
 end_time-start_time
+# str(mt)
+# level5<-mt$tree$left$left$left$left$left
+
 
 ###  Create multilevel basis
 source("multilevelbasis.R")
