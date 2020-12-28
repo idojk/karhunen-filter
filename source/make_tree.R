@@ -99,13 +99,13 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   tree$childleft<-node
   leftout<-create_tree(DATA,left_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
   tree$left<-leftout$tree
-  tree$node<-leftout$node
+  # tree$node<-leftout$node
   tree$DATA<-leftout$DATA
   
   tree$childright<- node
   rightout<-create_tree(DATA,right_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
   tree$right<-rightout$tree
-  tree$node<-rightout$node
+  # tree$node<-rightout$node
   tree$DATA<-rightout$DATA
   
   
