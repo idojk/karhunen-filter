@@ -96,29 +96,31 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   
   
   # Split (loops here) 
-  tree$childleft<-node
-  leftout<-create_tree(DATA,left_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
-  tree$left<-leftout$tree
-  # tree$node<-leftout$node
-  tree$DATA<-leftout$DATA
+  tree$childleft<- node
+  out<-create_tree(DATA,left_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
+  tree$left<-out$tree
+  tree$node<-out$node
+  tree$DATA<-out$DATA
   
-  tree$childright<- node
-  rightout<-create_tree(DATA,right_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
-  tree$right<-rightout$tree
-  # tree$node<-rightout$node
-  tree$DATA<-rightout$DATA
+  # the function didn't eat the new node value
+  tree$childright<-node
+  out<-create_tree(DATA,right_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
+  tree$right<-out$tree
+  tree$node<-out$node
+  tree$DATA<-out$DATA 
   
   
   tree$threshold<-sp$threshold
   tree$split_dir<-sp$split_dir
-  tree$proj_data<-list(sp$proj_data)
+  tree$proj_data<-sp$proj_data
+  
   
   # Add information on parent node
   tree$left$parentnode<- parentnode
   tree$right$parentnode<- parentnode
   
   # return(data.frame(tree,node,data))
-  return(list("tree"=tree,"node"=node,"DATA"=data))
+  return(list("tree"=tree,"node"=out$node,"DATA"=data))
 }
 
 
