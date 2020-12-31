@@ -1,7 +1,10 @@
 # Julio Change Detection
 # make_tree.m
 # 20201029 Xiaoyang Chen
-# complete date 12/20/2020
+# clean backup
+# To be done next: update path after finishing all modules
+
+
 
 #start
 `%notin%` <- Negate(`%in%`)
@@ -10,9 +13,9 @@
 make_tree<-function(DATA,split_function,params){
   
   #define nargin in R
-  #print(match.call())
   nargin <- length(as.list(match.call())) -1
-  
+ 
+   
   ### define make tree function
   if (nargin<2){
     split_function='split_PCA'
@@ -24,7 +27,8 @@ make_tree<-function(DATA,split_function,params){
     split_fxn_params<-list(spill)
     params$split_fxn_params<-list(split_fxn_params)
   }
-  
+
+    
   #Initialize first node
   node=0
   
@@ -37,16 +41,19 @@ make_tree<-function(DATA,split_function,params){
 }
 
 
+
+
 ### define create_tree function
 
 ### [tree, node,DATA] = create_tree(DATA,1:size(DATA,1),split_function,params.indexsetsize,params.split_fxn_params, params.MAX_DEPTH,1,node);
 create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MAX_DEPTH,curr_depth,node){
   setwd("H:\\2021Sep\\Julio\\ChangeDetection\\ChangeDetectionR\\") #change to package path
-  
+
   
   # initialize
   tree<-list()  #initialize null dataframe
-  tree$idxs <-list(idxs)
+  #tree$idxs <-list(idxs)
+  tree$idxs <-idxs
   mx <- dim(DATA)[1]
   tree$threshold = NaN
   tree$split_dir = NaN
@@ -61,26 +68,26 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   
   # Add node numbering
   tree$node = node
-  parentnode = node
+  parentnode = node #current node is the parent node of two branches
   
   
   # increase node
   node = node + 1
-  print(node)
   #cellinfo <-data.frame(matrix(ncol = 1, nrow = 1))
   
+  
   if (isTRUE(curr_depth>=MAX_DEPTH)) {
-     return(list("tree"=tree,"node"=node,"DATA"=data))
+    return(list("tree"=tree,"node"=node,"DATA"=data))
   }
   if (isTRUE( length(idxs)<=ceiling(indexsetsize + 1) )) {
-     return(list("tree"=tree,"node"=node,"DATA"=data))
+    return(list("tree"=tree,"node"=node,"DATA"=data))
   }
+  
   
   
   #[idx_left, idx_right, threshold, split_dir, proj_data] = split_function(DATA(idxs,:), split_fxn_params);
   source('split_KD.R')
   sp<-split_KD(as.matrix(DATA[idxs,]), split_fxn_params)
-
   
   #overwrite left_idxs and right_idxs for next layer
   left_idxs <- idxs*sp$left_idx
@@ -89,25 +96,29 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   right_idxs<-right_idxs[right_idxs!=0]
   
   
+  
   # Test
   if (  (length(left_idxs)< indexsetsize) || (length(right_idxs) < indexsetsize)  ){
-     return(list("tree"=tree,"node"=node,"DATA"=data))
+    return(list("tree"=tree,"node"=node,"DATA"=data))
   }
   
   
-  # Split (loops here) 
+
+  #Split (loops here)
   tree$childleft<- node
-  out<-create_tree(DATA,left_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
-  tree$left<-out$tree
-  tree$node<-out$node
-  tree$DATA<-out$DATA
-  
-  # the function didn't eat the new node value
+  lout<-create_tree(DATA,left_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
+  tree$left<-lout$tree
+  tree$DATA<-lout$DATA
+  node<-lout$node #pass the increased node to environment variable node
+
+
   tree$childright<-node
-  out<-create_tree(DATA,right_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
-  tree$right<-out$tree
-  tree$node<-out$node
-  tree$DATA<-out$DATA 
+  rout<-create_tree(DATA,right_idxs,split_function,indexsetsize,split_fxn_params,MAX_DEPTH,curr_depth+1,node)
+  tree$right<-rout$tree
+  tree$DATA<-rout$DATA 
+  node<-rout$node
+
+  
   
   
   tree$threshold<-sp$threshold
@@ -119,8 +130,8 @@ create_tree<-function(DATA,idxs,split_function,indexsetsize,split_fxn_params, MA
   tree$left$parentnode<- parentnode
   tree$right$parentnode<- parentnode
   
-  # return(data.frame(tree,node,data))
-  return(list("tree"=tree,"node"=out$node,"DATA"=data))
-}
 
+  # End
+  return(list("tree"=tree,"node"=node,"DATA"=data))
+}
 
