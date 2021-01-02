@@ -31,8 +31,8 @@ convertbintreetolist<-function(tree){
   parentnode = 0
   
   #[leftchild,rightchild,parent,datacell,datalevel,node] = createdata(leftchild,rightchild,parent,datacell,tree,datalevel,node);
-  createdataout<-createdata(leftchild,rightchild,parent,datacell,tree,datalevel,node)
-  return(list('leftchild'=leftchild,'rightchild'=rightchild,'parent'=parent,'datacell'=datacell,'datalevel'=datalevel,'node'=node))
+  cdt<-createdata(leftchild,rightchild,parent,datacell,tree,datalevel,node)
+  return(list('leftchild'=cdt$leftchild,'rightchild'=cdt$rightchild,'parent'=cdt$parent,'datacell'=cdt$datacell,'datalevel'=cdt$datalevel))
   
 }
 
