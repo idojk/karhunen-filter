@@ -49,7 +49,55 @@ multilevelbasis<-function(tree,coords,degree,polymodel){
   }
   
  
+ 
   minlevel = 1
+  
+  while (currentlevel > minlevel ) {
+    currentlevel <- currentlevel - 1
+
+    while ( sortdatalevel[levelcounter] == currentlevel ){
+  
+      if (leftchild(ind[levelcounter]) == 0 && rightchild(ind[levelcounter]) == 0) {
+       # Check if it is a leaf  
+        llb<-leaflocalbasis(cl$datacell[[ind[levelcounter]]], coords=mt$DATA, polymodel,degree)
+        transformcell[levelcounter,1]<-list(llb$Scfun)
+        transformcell[levelcounter,2]<-list(llb$Wavefun)
+        transformcell[levelcounter,3]<-list(llb$Cwave)
+        transformcell[levelcounter,4]<-list(llb$Dwave)
+        # 1/6 stop here
+      }
+      
+      else if (leftchild$ind[levelcounter] != 0 && rightchild$ind[levelcounter] == 0) {
+      # One child (left)  donothing
+      transformcell[levelcounter,1] = transformcell[unsortkey(leftchild(ind[levelcounter]) + 1), 1]
+      transformcell[levelcounter,2] = NaN
+      
+      transformcell[levelcounter,3] = transformcell[unsortkey(leftchild(ind[levelcounter]) + 1), 3]
+      transformcell[levelcounter,4] = NaN
+      # Clean not needed vectors 
+      }
+      
+      else if (leftchild$ind[levelcounter] == 0 && rightchild$ind[levelcounter] != 0) {
+      # One child (right) donothing
+      transformcell[levelcounter,1] = transformcell[unsortkey(rightchild(ind[levelcounter]) + 1), 1]
+      transformcell[levelcounter,2] = NaN
+      
+      transformcell[levelcounter,3] = transformcell[unsortkey(rightchild(ind[levelcounter]) + 1), 3]
+      transformcell[levelcounter,4] = NaN
+      
+      # Clean not needed vectors 
+      } else {
+      
+      # Two Children
+      }
+      
+      
+      levelcounter=levelcounter - 1
+      }
+  # Transform last level
+  # Add information of locations of basis functions in sparse matrix
+  }
+  
   
   
   
