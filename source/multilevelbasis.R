@@ -87,15 +87,26 @@ multilevelbasis<-function(tree,coords,degree,polymodel){
       
       # Clean not needed vectors 
       } else {
+      # Two Children: both !=0
+      #function [Scfun, Wavefun, Cwave, Dwave] = localbasis(Vleft, left_idxs, Vright, right_idxs, idxs, coords, polymodel, degree);
+      lb<-localbasis(Vleft = transformcell[[unsortkey[cl$leftchild[ind[levelcounter]]+1], 1]],
+                     left_idxs = cl$datacell[[cl$leftchild[ind[levelcounter]]+1]],
+                     Vright = transformcell[[unsortkey[cl$rightchild[ind[levelcounter]]+1], 1]], 
+                     right_idxs = cl$datacell[[cl$rightchild[ind[levelcounter]]+1]],
+                     idxs = cl$datacell[[ind[levelcounter]]],
+                     coords=mt$DATA, polymodel,degree)
       
-      # Two Children
+      transformcell[levelcounter,1]<-list(lb$Scfun)
+      transformcell[levelcounter,2]<-list(lb$Wavefun)
+      transformcell[levelcounter,3]<-list(lb$Cwave)
+      transformcell[levelcounter,4]<-list(lb$Dwave)
       }
       
       
       levelcounter=levelcounter - 1
-      }
-  # Transform last level
-  # Add information of locations of basis functions in sparse matrix
+      print(levelcounter)
+    }
+ 
   }
   
   
