@@ -14,14 +14,13 @@ n<-nrow(coords)
 m<-ncol(coords)
 
 # Initial basis 
-# V = [[Vleft zeros(size(Vleft,1), size(Vright,2))];
-#      [zeros(size(Vright,1), size(Vleft,2)), Vright]
-#      ];
+V<-rbind(    cbind(  Vleft,matrix(0,nrow=nrow(Vleft), ncol=ncol(Vright))  ),
+             cbind(  matrix(0,nrow=nrow(Vright), ncol=ncol(Vleft)),Vright  )    )
 
 # sort V
-tmplridx = sort(cbind(left_idxs,right_idxs),index.return=TRUE)
+tmplridx <- sort(c(left_idxs,right_idxs),index.return=TRUE)
 key<-tmplridx$ix
-V<-as.matrix(V[key,])
+V<-V[key,]
 
 # Create local momement matrix
 # Q = PolynomialMonomials(degree, coords, polymodel,idxs);
