@@ -34,25 +34,36 @@ polymodel<-data.frame(M)
 indexsetsize = n
 params<-data.frame(indexsetsize)
 
+
 ### Create Multilevel Binary tree
 setwd("H:/2021Sep/Julio/ChangeDetection/ChangeDetectionR")
-source("make_tree.R")
+source("make_tree.R") #comment it when debugging
 
-start_time<- Sys.time()
+# start_time<- Sys.time()
 mt<-make_tree(data,split_KD,params)
-end_time<- Sys.time()
-end_time-start_time
+# end_time<- Sys.time()
+# end_time-start_time
+
+# check results
 # str(mt)
 # level5<-mt$tree$left$left$left$left$left
+# mt[['tree']][['left']][['left']][['left']][['left']][['left']][['idxs']]
+# mt[['tree']][['left']][['left']][['left']][['left']][['right']][['idxs']]
+# right should be 17:32
 
 
 ###  Create multilevel basis
 source("multilevelbasis.R")
-multilevelbasis
+# start_time<- Sys.time()
+mb<-multilevelbasis(mt$tree,coords=mt$DATA,degree,polymodel)
+# end_time<- Sys.time()
+# end_time-start_time
+
 
 ###  Run transform with random data-Orginal realization of the stochastic process
 cte<-as.matrix(sqrt(3) * 2 * (runif(n) - 1/2))
 Q = 1 + M %*%(cte*eigenlambda)
+par(mar = rep(2, 4))
 plot(x,Q,title(main='KL Realization'))
 
 ### Metrics
