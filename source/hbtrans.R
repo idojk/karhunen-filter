@@ -12,10 +12,10 @@ hbtrans<-function(fdata, transformcell, ind, datacell, datalevel) {
 
   # Projection
   numofnodes = nrow(transformcell)
-  coeff = NaN
-  levelcoeff = NaN
+  coeff = vector()
+  levelcoeff = vector()
   dcoeffs = matrix(list(),numofnodes,1)
-  ccoeffs = NaN
+  ccoeffs = vector()
   
   
   # Up to level 0 of HB coefficients
@@ -36,14 +36,17 @@ hbtrans<-function(fdata, transformcell, ind, datacell, datalevel) {
   # Perform zero last level
   if (  is.null(transformcell[1,1]) == FALSE  ) {
       V <- transformcell[[1,1]]
-      coeff <- cbind(coeff, t(fdata) %*% V)
+      coeff <- c(coeff, t(fdata) %*% V)
       ccoeffs <- t(fdata) %*% V
       levelcoeff <- c(  levelcoeff,rep(-1,ncol(V))  )
       coeff <-t(coeff)
       }
   
+ 
   nfdata = length(fdata)
   outputcoeff = rep(0,nfdata)
   outputcoeff[1:length(coeff)] <- coeff
 
+ 
+  return(list('outputcoeff'=outputcoeff, 'levelcoeff'=levelcoeff, 'dcoeffs'=dcoeffs, 'ccoeffs'=ccoeffs))
 }
