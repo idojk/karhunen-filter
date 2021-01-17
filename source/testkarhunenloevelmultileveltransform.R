@@ -2,7 +2,14 @@
 # testkarhunenloevelmultileveltransform.m
 # 20201107 Xiaoyang Chen
 
+
 `%notin%` <- Negate(`%in%`)
+
+setwd("H:/2021Sep/Julio/ChangeDetection/ChangeDetectionR")
+source("make_tree.R") #comment it when debugging
+source("multilevelbasis.R")
+source("hbtrans.R")
+source("invhbtrans.R")
 
 ###Data and parameters
 degree <-matrix(NaN,1,1)
@@ -30,15 +37,18 @@ for (i in 2 : n)
   }
 
 eigenlambda = t(eigenlambda) 
-polymodel<-data.frame(M)
+
+# Optional design matrix
+polymodel<-list()
+polymodel$M<-M
+#class(polymodel$M)
+
 indexsetsize = n
 params<-data.frame(indexsetsize)
 
 
-### Create Multilevel Binary tree
-setwd("H:/2021Sep/Julio/ChangeDetection/ChangeDetectionR")
-source("make_tree.R") #comment it when debugging
 
+### Create Multilevel Binary tree
 # start_time<- Sys.time()
 mt<-make_tree(data,split_KD,params)
 # end_time<- Sys.time()
@@ -53,7 +63,6 @@ mt<-make_tree(data,split_KD,params)
 
 
 ###  Create multilevel basis
-source("multilevelbasis.R")
 # start_time<- Sys.time()
 mb<-multilevelbasis(mt$tree,coords=mt$DATA,degree,polymodel)
 # end_time<- Sys.time()
@@ -61,24 +70,32 @@ mb<-multilevelbasis(mt$tree,coords=mt$DATA,degree,polymodel)
 
 
 ###  Run transform with random data-Orginal realization of the stochastic process
-cte<-as.matrix(sqrt(3) * 2 * (runif(n) - 1/2))
+cte<-as.matrix(sqrt(3) * 2 * (runif(n) - 1/2)) 
 Q = 1 + M %*%(cte*eigenlambda)
 par(mar = rep(2, 4))
-plot(x,Q,title(main='KL Realization'))
+# plot(x,Q,title(main='KL Realization'))
+#plot is different since cte is random everytime
 
 ### Metrics
 numvecs  <- ncol(Q)
 maxerror=Inf
 maxwaverror=Inf
 
-#tic; set timer to R
+#initialize indicator
+n=1
+polyerror<-list()
+wavecoeffnorm<-list()
+
 for (n in 1:numvecs){
-data.frame(coeff, levelcoeff, dcoeffs, ccoeffs) <- hbtrans(Q[,n], multileveltree, ind, datacell, datalevel)
-Qv  <- invhbtrans(dcoeffs, ccoeffs, multileveltree, ind, datacell, datalevel, numofpoints)
-polyerror(n)  <- norm(Q[,n] - Qv, 2) / norm(Q[,n])
-wavecoeffnorm(n)  <- norm(coeff[1 : end - params.indexsetsize],'inf')/norm(Q[,n])
-}
-#t  <- toc
+
+  hbt<-hbtrans(Q[,n], mb$multileveltree, mb$ind, mb$datacell, mb$datalevel)
+  
+  Qv<-invhbtrans(hbt$dcoeffs, hbt$ccoeffs, mb$multileveltree, mb$ind, mb$datacell, mb$datalevel, numofpoints)
+  
+  polyerror[n]<- norm(Q[,n]-Qv, type='2') / norm(matrix(Q[,n]))
+  wavecoeffnorm[n]<- norm(matrix(hbt$outputcoeff[1:(length(hbt$outputcoeff)-params$indexsetsize)]),type='i')/ norm(matrix(Q[,n]))
+  #coeff == hbt$outputcoeff
+  }
 
 #Test format change from vector of coefficients to struct
 totalerror=0
