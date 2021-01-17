@@ -86,6 +86,7 @@ n=1
 polyerror<-list()
 wavecoeffnorm<-list()
 
+start_time<- Sys.time()
 for (n in 1:numvecs){
 
   hbt<-hbtrans(Q[,n], mb$multileveltree, mb$ind, mb$datacell, mb$datalevel)
@@ -93,9 +94,22 @@ for (n in 1:numvecs){
   Qv<-invhbtrans(hbt$dcoeffs, hbt$ccoeffs, mb$multileveltree, mb$ind, mb$datacell, mb$datalevel, numofpoints)
   
   polyerror[n]<- norm(Q[,n]-Qv, type='2') / norm(matrix(Q[,n]))
+  
   wavecoeffnorm[n]<- norm(matrix(hbt$outputcoeff[1:(length(hbt$outputcoeff)-params$indexsetsize)]),type='i')/ norm(matrix(Q[,n]))
   #coeff == hbt$outputcoeff
   }
+end_time<- Sys.time()
+message('Total timing=   ',end_time-start_time)
+
+message('Results: Num of tests =   ', numvecs)
+message('Max Relative Error =   ', max(unlist(polyerror)))
+message('Relative HBcoefficientsnorm =   ',max(unlist(wavecoeffnorm)))
+#test one hbtrans running
+start_time<- Sys.time()
+hbttime<- hbtrans(Q[,n], mb$multileveltree, mb$ind, mb$datacell, mb$datalevel)
+end_time<- Sys.time()
+message('One Hierarchical Basis transform time=   ',end_time-start_time)
+
 
 #Test format change from vector of coefficients to struct
 totalerror=0
