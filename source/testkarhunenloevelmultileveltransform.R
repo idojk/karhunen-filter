@@ -113,26 +113,45 @@ message('One Hierarchical Basis transform time=   ',end_time-start_time)
 
 #Test format change from vector of coefficients to struct
 totalerror=0
-as.matrix(a,b) <- hbvectortocoeffs(coeff, multileveltree, ind, datacell, datalevel, numofpoints)
-for (i in 1 : length(dcoeffs)){
-totalerror <- totalerror + (norm[a[i] -  dcoeffs[i]])
-end
-totalerror <- totalerror + (norm[b -  ccoeffs])
-print('Total error = %e \n', totalerror)
-}
+hbcoef <- hbvectortocoeffs(hbt$outputcoeff,mb$multileveltree,mb$ind,mb$datacell,mb$datalevel,numofpoints)
+a<-hbcoef$dcoeffs
+b<-hbcoef$ccoeffs
+for (i in 1:length(hbcoef$dcoeffs)){
+  totalerror <- totalerror + max(svd( matrix(a[[i]]-hbcoef$dcoeffs[[i]]) )$d)
+  }
+totalerror <- totalerror + max(svd( matrix(b-hbcoef$ccoeffs) )$d)
+message('Total error = ', totalerror)
+
 
 ### Plot coefficients
-figure(2)
-maxlevel = max(levelcoeff)
+#figure(2)
+maxlevel = max(hbt$levelcoeff)
 numlevel = 3
 counter = 1
-subplot(numlevel + 2,1,counter)
-plot(x,Q)
-for (n in maxlevel : -1 : maxlevel - numlevel){
-counter = counter + 1
-subplot(numlevel + 2, 1, counter, title('Level Coefficients = ',num2str(n))) #TBD
-stem(coeff(levelcoeff == n))
+n=1
+
+par(mar = rep(2, 4))
+plot2<-list()
+plot2[[1]]<-plot(x,Q,title(main='KL Realization'))
+print(plot2[[1]])
+
+# par(c(numlevel+2,1))
+for (n in maxlevel:(maxlevel-numlevel)){
+  counter<-counter + 1
+  
+  plot2data<-data.frame(px=1:length(hbt$levelcoeff[hbt$levelcoeff == n]),py=hbt$outputcoeff[hbt$levelcoeff == n])
+  plot2[[counter]]<-ggplot(plot2data, aes(x=px, y=py))+
+  geom_segment( aes(x=px, xend=px, y=0, yend=py), color="grey")+
+  geom_point(color="blue", size=2)+
+  theme_light()+
+  ggtitle(paste("Level Coefficients = ",n))
+  print(plot2[[counter]])
+  
+  n=n-1
 }
+# TBD combine multiple plot
+#dev.off()
+
 
 ### Run trans
 print('\n');
