@@ -79,9 +79,8 @@ mb<-multilevelbasis(mt$tree,coords=mt$DATA,degree,polymodel)
 ###  Run transform with random data-Orginal realization of the stochastic process
 cte<-as.matrix(sqrt(3) * 2 * (runif(n) - 1/2)) 
 Q = 1 + M %*%(cte*eigenlambda)
-# par(mar = rep(2, 4))
-# png(filename = "tkt_plot1.png", width = 400, height = 600, units = "px")
-plot1<-ggplot(data.frame(x,Q), aes(x=x, y=Q))+geom_line()+theme_light()+ggtitle('KL Realization')    
+# png(filename = "tkt_plot1.png", width = 400, height = 300, units = "px")
+ggplot(data.frame(x,Q), aes(x=x, y=Q))+geom_line()+theme_light()+ggtitle('KL Realization')
 # dev.off()
 #plot is different since cte is random everytime
 
