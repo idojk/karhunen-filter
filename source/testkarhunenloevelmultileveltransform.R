@@ -123,19 +123,21 @@ totalerror <- totalerror + max(svd( matrix(b-hbcoef$ccoeffs) )$d)
 message('Total error = ', totalerror)
 
 
+
 ### Plot coefficients
+library(ggplot2)
+library(gridExtra)
+
 #figure(2)
 maxlevel = max(hbt$levelcoeff)
 numlevel = 3
 counter = 1
 n=1
+# par(mar = rep(2, 4))
+plot2<-matrix(list(),1,5)
+plot2[[1]]<-ggplot(data.frame(x,Q), aes(x=x, y=Q))+geom_point()+ggtitle('KL Realization')+ theme_light()             
+# print(plot2[[1]])
 
-par(mar = rep(2, 4))
-plot2<-list()
-plot2[[1]]<-plot(x,Q,title(main='KL Realization'))
-print(plot2[[1]])
-
-# par(c(numlevel+2,1))
 for (n in maxlevel:(maxlevel-numlevel)){
   counter<-counter + 1
   
@@ -149,36 +151,61 @@ for (n in maxlevel:(maxlevel-numlevel)){
   
   n=n-1
 }
-# TBD combine multiple plot
-#dev.off()
+
+png(filename = "tkt_plot2.png", width = 800, height = 1200, units = "px")
+grid.arrange(plot2[[1]],plot2[[2]],plot2[[3]],plot2[[4]],plot2[[5]],ncol=1)
+dev.off()
+
 
 
 ### Run trans
-print('\n');
-print('Add Bump to KL  --------------------------------\n')
-
+print('Add Bump to KL ')
 #Random realization
 #Q = polymodel.M * rand(size(polymodel.M,2),1);
-
-#Add Gaussian "bump" to the data
+###Add Gaussian "bump" to the data
 sbump = 0.5
 Qkl = Q
 sigma = 0.001
 maxbump = 0.05
 bump <- maxbump * exp(- ((t(x) - sbump)^2) /sigma)
-bump[1:150] = 0
-bump[350:end] = 0
-Q = Q + bump
+bump[1:150] <- 0
+bump[350:length(bump)] <- 0
+Q <- Q + t(bump)
 
 numvecs = ncol(Q)
-maxerror =Inf
-maxwaverror =Inf
-#tic;
-for (n in 1 : numvecs){
-    data.frame(coeff, levelcoeff, dcoeffs, ccoeffs) = hbtrans(Q[,n], multileveltree, ind, datacell, datalevel)
-    Qv = invhbtrans(dcoeffs, ccoeffs, multileveltree, ind, datacell, datalevel, numofpoints)
-    polyerror[n] = norm(Q[,n] - Qv, 2) / norm(Q[,n])
-    wavecoeffnorm[n] = norm(coeff[1 : end - params.indexsetsize],'inf')/norm(Q[,n])
+maxerror=Inf
+maxwaverror=Inf
+for (n in 1:numvecs){
+  hbt<-hbtrans(Q[,n], mb$multileveltree, mb$ind, mb$datacell, mb$datalevel)
+  
+  Qv<-invhbtrans(hbt$dcoeffs, hbt$ccoeffs, mb$multileveltree, mb$ind, mb$datacell, mb$datalevel, numofpoints)
+  
+  polyerror[n]<- norm(Q[,n]-Qv, type='2') / norm(matrix(Q[,n]))
+  
+  wavecoeffnorm[n]<- norm(matrix(hbt$outputcoeff[1:(length(hbt$outputcoeff)-params$indexsetsize)]),type='i')/ norm(matrix(Q[,n]))
 }
-#t = toc;
 
+
+#figure(3)
+plot3<-matrix(list(),1,3)
+
+plot3[[1]]<-ggplot(data.frame(x,Qkl), aes(x=x, y=Qkl))+geom_line()+theme_light()+
+            ggtitle('KL Realization without Gaussian bump')            
+# print(plot3[[1]])
+plot3y2<-maxbump * exp(- ((t(x) - sbump)^2) /sigma)
+plot3[[2]]<-ggplot(data.frame(x,plot3y2), aes(x=x, y=plot3y2))+geom_line()+theme_light()+
+            ggtitle('Gaussian bump')   
+plot3[[3]]<-ggplot(data.frame(x,Q), aes(x=x, y=Q))+geom_line()+theme_light()+
+            ggtitle('KL Realization with Gaussian bump')  
+
+png(filename = "tkt_plot3.png", width = 480, height = 800, units = "px")
+grid.arrange(plot3[[1]],plot3[[2]],plot3[[3]],ncol=1)
+dev.off()
+
+
+#figure(4)
+maxlevel = max(hbt$levelcoeff)
+numlevel = 5
+counter = 1
+n=1
+plot4<-matrix(list(),1,numlevel)
