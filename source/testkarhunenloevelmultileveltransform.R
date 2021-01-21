@@ -11,6 +11,13 @@ source("multilevelbasis.R")
 source("hbtrans.R")
 source("invhbtrans.R")
 
+
+#start of the tkt
+library(ggplot2)
+# library(patchwork)
+library(gridExtra)
+
+
 ###Data and parameters
 degree <-matrix(NaN,1,1)
 numofpoints <-500
@@ -72,9 +79,13 @@ mb<-multilevelbasis(mt$tree,coords=mt$DATA,degree,polymodel)
 ###  Run transform with random data-Orginal realization of the stochastic process
 cte<-as.matrix(sqrt(3) * 2 * (runif(n) - 1/2)) 
 Q = 1 + M %*%(cte*eigenlambda)
-par(mar = rep(2, 4))
-# plot(x,Q,title(main='KL Realization'))
+# par(mar = rep(2, 4))
+# png(filename = "tkt_plot1.png", width = 400, height = 600, units = "px")
+plot1<-ggplot(data.frame(x,Q), aes(x=x, y=Q))+geom_line()+theme_light()+ggtitle('KL Realization')    
+# dev.off()
 #plot is different since cte is random everytime
+
+
 
 ### Metrics
 numvecs  <- ncol(Q)
@@ -124,10 +135,8 @@ message('Total error = ', totalerror)
 
 
 
-### Plot coefficients
-library(ggplot2)
-library(gridExtra)
 
+### Plot coefficients
 #figure(2)
 maxlevel = max(hbt$levelcoeff)
 numlevel = 3
@@ -147,14 +156,14 @@ for (n in maxlevel:(maxlevel-numlevel)){
   geom_point(color="blue", size=2)+
   theme_light()+
   ggtitle(paste("Level Coefficients = ",n))
-  print(plot2[[counter]])
+  # print(plot2[[counter]])
   
   n=n-1
 }
 
-png(filename = "tkt_plot2.png", width = 800, height = 1200, units = "px")
+# png(filename = "tkt_plot2.png", width = 800, height = 1200, units = "px")
 grid.arrange(plot2[[1]],plot2[[2]],plot2[[3]],plot2[[4]],plot2[[5]],ncol=1)
-dev.off()
+# dev.off()
 
 
 
@@ -172,6 +181,7 @@ bump[1:150] <- 0
 bump[350:length(bump)] <- 0
 Q <- Q + t(bump)
 
+# matlab line 157-164    why do we need this, besides of timing? It will overwrite previous results.
 numvecs = ncol(Q)
 maxerror=Inf
 maxwaverror=Inf
@@ -186,6 +196,7 @@ for (n in 1:numvecs){
 }
 
 
+
 #figure(3)
 plot3<-matrix(list(),1,3)
 
@@ -198,9 +209,10 @@ plot3[[2]]<-ggplot(data.frame(x,plot3y2), aes(x=x, y=plot3y2))+geom_line()+theme
 plot3[[3]]<-ggplot(data.frame(x,Q), aes(x=x, y=Q))+geom_line()+theme_light()+
             ggtitle('KL Realization with Gaussian bump')  
 
-png(filename = "tkt_plot3.png", width = 480, height = 800, units = "px")
+# png(filename = "tkt_plot3.png", width = 480, height = 800, units = "px")
 grid.arrange(plot3[[1]],plot3[[2]],plot3[[3]],ncol=1)
-dev.off()
+# dev.off()
+
 
 
 #figure(4)
@@ -209,3 +221,32 @@ numlevel = 5
 counter = 1
 n=1
 plot4<-matrix(list(),1,numlevel)
+plot4[[1]]<-ggplot(data.frame(x,Q,Qkl,plot3y2), aes(x=x))+theme_light()+
+  geom_line(aes(y=Q),color='blue')+
+  geom_line(aes(y=Qkl),linetype='dashed')+
+  geom_line(aes(y=plot3y2),color='orange')
+
+
+outputcell<-matrix(list(),numlevel+2,2)
+outputcell[1]<-list(t(x))
+outputcell[2]<-list(plot3y2)
+
+for (n in maxlevel:(maxlevel-numlevel)){
+  counter<-counter + 1
+  
+  plot4data<-data.frame(px=1:length(hbt$levelcoeff[hbt$levelcoeff == n]),py=hbt$outputcoeff[hbt$levelcoeff == n])
+  plot4[[counter]]<-ggplot(plot4data, aes(x=px, y=py))+
+    geom_segment( aes(x=px, xend=px, y=0, yend=py), color="grey")+
+    geom_point(color="blue", size=2)+
+    theme_light()+
+    ggtitle(paste("Level Coefficients = ",n))
+  # print(plot4[[counter]])
+  
+  outputcell[counter+1]<-list(hbt$levelcoeff[hbt$levelcoeff == n])
+  
+  n=n-1
+}
+
+# png(filename = "tkt_plot4.png", width = 800, height = 1600, units = "px")
+grid.arrange(plot4[[1]],plot4[[2]],plot4[[3]],plot4[[4]],plot4[[5]],plot4[[6]],plot4[[7]],ncol=1)
+# dev.off()
