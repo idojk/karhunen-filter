@@ -3,65 +3,47 @@
 # 20201107 Xiaoyang Chen
 
 
-`%notin%` <- Negate(`%in%`)
+# options(buildtools.check = function(action) TRUE )
+# install.packages("devtools")
+# install.packages("tidyverse")
+# install.packages("dbplyr")
+# install.packages("hms")
+# install.packages("pillar")
+# install.packages("rlang")
+# install.packages("ggplot2")
+# install.packages("gridExtra")
+# install.packages('patchwork')
+##check one package version
+# packageVersion('')
+##check all packages
+# sessionInfo()
+# library(patchwork)
 
+library(ggplot2)
+library(gridExtra)
+
+`%notin%` <- Negate(`%in%`)
 setwd("H:/2021Sep/Julio/ChangeDetection/ChangeDetectionR")
-source("make_tree.R") #comment it when debugging
+source("initializationVec.R") #comment it when debugging
+source("make_tree.R") 
 source("multilevelbasis.R")
 source("hbtrans.R")
 source("invhbtrans.R")
+source("hbvectortocoeffs.R")
 
-
-#start of the tkt
-library(ggplot2)
-# library(patchwork)
-library(gridExtra)
 
 
 ###Data and parameters
-degree <-matrix(NaN,1,1)
-numofpoints <-500
-
-d <-1
-data <-as.matrix(seq(0,d,len=numofpoints))
-n <-10
-x <-as.matrix(seq(0,d,len=numofpoints))
-M <-matrix(1,dim(x)[1],dim(x)[2])
-Lc <-0.01
-Lp <-max(d,2*Lc)
-L  <-Lc / Lp
-i=1
-eigenlambda <-matrix(sqrt(sqrt(pi)*L / 2),1,n)
-
-for (i in 2 : n)
-  {
-  if (floor(i/2) == i/2 ) 
-  phi=(1 / i) * sin ( floor(i/2) * pi * x / Lp ) else
-  phi=(1 / i) * cos ( floor(i/2) * pi * x / Lp )
-  
-  eigenlambda[1,i]=sqrt(sqrt(pi) * L) * exp( - ( (floor(i/2) * pi * L)^2 ) / 8 )
-  M <-cbind(M, phi)
-  }
-
-eigenlambda = t(eigenlambda) 
-
-# Optional design matrix
-polymodel<-list()
-polymodel$M<-M
-#class(polymodel$M)
-
-indexsetsize = n
-params<-data.frame(indexsetsize)
+ini<-initializationVec(numofpoints=500)
 
 
 
 ### Create Multilevel Binary tree
 # start_time<- Sys.time()
-mt<-make_tree(data,split_KD,params)
+mt<-make_tree(ini$data,split_KD,ini$params) #split_KD to be update
 # end_time<- Sys.time()
 # end_time-start_time
-
-# check results
+## check results
 # str(mt)
 # level5<-mt$tree$left$left$left$left$left
 # mt[['tree']][['left']][['left']][['left']][['left']][['left']][['idxs']]
@@ -69,18 +51,24 @@ mt<-make_tree(data,split_KD,params)
 # right should be 17:32
 
 
+
 ###  Create multilevel basis
 # start_time<- Sys.time()
-mb<-multilevelbasis(mt$tree,coords=mt$DATA,degree,polymodel)
+mb<-multilevelbasis(mt$tree,coords=mt$DATA,ini$degree,ini$polymodel)
 # end_time<- Sys.time()
 # end_time-start_time
 
 
+
+
+
+#################  Plotting starts  ########################
+
 ###  Run transform with random data-Orginal realization of the stochastic process
-cte<-as.matrix(sqrt(3) * 2 * (runif(n) - 1/2)) 
-Q = 1 + M %*%(cte*eigenlambda)
+cte<-as.matrix(sqrt(3) * 2 * (runif(ini$n) - 1/2)) 
+Q = 1 + ini$polymodel$M %*%(cte*ini$eigenlambda)
 # png(filename = "tkt_plot1.png", width = 400, height = 300, units = "px")
-ggplot(data.frame(x,Q), aes(x=x, y=Q))+geom_line()+theme_light()+ggtitle('KL Realization')
+ggplot(data.frame(ini$x,Q), aes(x=ini$x, y=Q))+geom_line()+theme_light()+ggtitle('KL Realization')    
 # dev.off()
 #plot is different since cte is random everytime
 
@@ -101,19 +89,19 @@ for (n in 1:numvecs){
 
   hbt<-hbtrans(Q[,n], mb$multileveltree, mb$ind, mb$datacell, mb$datalevel)
   
-  Qv<-invhbtrans(hbt$dcoeffs, hbt$ccoeffs, mb$multileveltree, mb$ind, mb$datacell, mb$datalevel, numofpoints)
+  Qv<-invhbtrans(hbt$dcoeffs, hbt$ccoeffs, mb$multileveltree, mb$ind, mb$datacell, mb$datalevel, ini$numofpoints)
   
   polyerror[n]<- norm(Q[,n]-Qv, type='2') / norm(matrix(Q[,n]))
   
-  wavecoeffnorm[n]<- norm(matrix(hbt$outputcoeff[1:(length(hbt$outputcoeff)-params$indexsetsize)]),type='i')/ norm(matrix(Q[,n]))
+  wavecoeffnorm[n]<- norm(matrix(hbt$outputcoeff[1:(length(hbt$outputcoeff)-ini$params$indexsetsize)]),type='i')/ norm(matrix(Q[,n]))
   #coeff == hbt$outputcoeff
   }
 end_time<- Sys.time()
 message('Total timing=   ',end_time-start_time)
-
 message('Results: Num of tests =   ', numvecs)
 message('Max Relative Error =   ', max(unlist(polyerror)))
 message('Relative HBcoefficientsnorm =   ',max(unlist(wavecoeffnorm)))
+
 #test one hbtrans running
 start_time<- Sys.time()
 hbttime<- hbtrans(Q[,n], mb$multileveltree, mb$ind, mb$datacell, mb$datalevel)
@@ -123,7 +111,7 @@ message('One Hierarchical Basis transform time=   ',end_time-start_time)
 
 #Test format change from vector of coefficients to struct
 totalerror=0
-hbcoef <- hbvectortocoeffs(hbt$outputcoeff,mb$multileveltree,mb$ind,mb$datacell,mb$datalevel,numofpoints)
+hbcoef <- hbvectortocoeffs(hbt$outputcoeff,mb$multileveltree,mb$ind,mb$datacell,mb$datalevel,ini$numofpoints)
 a<-hbcoef$dcoeffs
 b<-hbcoef$ccoeffs
 for (i in 1:length(hbcoef$dcoeffs)){
@@ -143,7 +131,7 @@ counter = 1
 n=1
 # par(mar = rep(2, 4))
 plot2<-matrix(list(),1,5)
-plot2[[1]]<-ggplot(data.frame(x,Q), aes(x=x, y=Q))+geom_point()+ggtitle('KL Realization')+ theme_light()             
+plot2[[1]]<-ggplot(data.frame(ini$x,Q), aes(x=ini$x, y=Q))+geom_line()+ggtitle('KL Realization')+ theme_light()             
 # print(plot2[[1]])
 
 for (n in maxlevel:(maxlevel-numlevel)){
@@ -175,7 +163,7 @@ sbump = 0.5
 Qkl = Q
 sigma = 0.001
 maxbump = 0.05
-bump <- maxbump * exp(- ((t(x) - sbump)^2) /sigma)
+bump <- maxbump * exp(- ((t(ini$x) - sbump)^2) /sigma)
 bump[1:150] <- 0
 bump[350:length(bump)] <- 0
 Q <- Q + t(bump)
@@ -187,11 +175,11 @@ maxwaverror=Inf
 for (n in 1:numvecs){
   hbt<-hbtrans(Q[,n], mb$multileveltree, mb$ind, mb$datacell, mb$datalevel)
   
-  Qv<-invhbtrans(hbt$dcoeffs, hbt$ccoeffs, mb$multileveltree, mb$ind, mb$datacell, mb$datalevel, numofpoints)
+  Qv<-invhbtrans(hbt$dcoeffs, hbt$ccoeffs, mb$multileveltree, mb$ind, mb$datacell, mb$datalevel, ini$numofpoints)
   
   polyerror[n]<- norm(Q[,n]-Qv, type='2') / norm(matrix(Q[,n]))
   
-  wavecoeffnorm[n]<- norm(matrix(hbt$outputcoeff[1:(length(hbt$outputcoeff)-params$indexsetsize)]),type='i')/ norm(matrix(Q[,n]))
+  wavecoeffnorm[n]<- norm(matrix(hbt$outputcoeff[1:(length(hbt$outputcoeff)-ini$params$indexsetsize)]),type='i')/ norm(matrix(Q[,n]))
 }
 
 
@@ -199,13 +187,13 @@ for (n in 1:numvecs){
 #figure(3)
 plot3<-matrix(list(),1,3)
 
-plot3[[1]]<-ggplot(data.frame(x,Qkl), aes(x=x, y=Qkl))+geom_line()+theme_light()+
+plot3[[1]]<-ggplot(data.frame(ini$x,Qkl), aes(x=ini$x, y=Qkl))+geom_line()+theme_light()+
             ggtitle('KL Realization without Gaussian bump')            
 # print(plot3[[1]])
-plot3y2<-maxbump * exp(- ((t(x) - sbump)^2) /sigma)
-plot3[[2]]<-ggplot(data.frame(x,plot3y2), aes(x=x, y=plot3y2))+geom_line()+theme_light()+
+plot3y2<-maxbump * exp(- ((t(ini$x) - sbump)^2) /sigma)
+plot3[[2]]<-ggplot(data.frame(ini$x,plot3y2), aes(x=ini$x, y=plot3y2))+geom_line()+theme_light()+
             ggtitle('Gaussian bump')   
-plot3[[3]]<-ggplot(data.frame(x,Q), aes(x=x, y=Q))+geom_line()+theme_light()+
+plot3[[3]]<-ggplot(data.frame(ini$x,Q), aes(x=ini$x, y=Q))+geom_line()+theme_light()+
             ggtitle('KL Realization with Gaussian bump')  
 
 # png(filename = "tkt_plot3.png", width = 480, height = 800, units = "px")
@@ -220,14 +208,14 @@ numlevel = 5
 counter = 1
 n=1
 plot4<-matrix(list(),1,numlevel)
-plot4[[1]]<-ggplot(data.frame(x,Q,Qkl,plot3y2), aes(x=x))+theme_light()+
+plot4[[1]]<-ggplot(data.frame(ini$x,Q,Qkl,plot3y2), aes(x=ini$x))+theme_light()+
   geom_line(aes(y=Q),color='blue')+
   geom_line(aes(y=Qkl),linetype='dashed')+
   geom_line(aes(y=plot3y2),color='orange')
 
 
 outputcell<-matrix(list(),numlevel+2,2)
-outputcell[1]<-list(t(x))
+outputcell[1]<-list(t(ini$x))
 outputcell[2]<-list(plot3y2)
 
 for (n in maxlevel:(maxlevel-numlevel)){
